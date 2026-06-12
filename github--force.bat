@@ -15,6 +15,7 @@ if exist "C:\Program Files\Git\bin\git.exe" (
 "%GIT%" init 2>nul
 "%GIT%" remote add origin https://github.com/airisu233/kenneyDungeon 2>nul
 "%GIT%" branch -m main 2>nul
+"%GIT%" checkout main
 "%GIT%" add .
 "%GIT%" commit -m "backup: %date% %time%"
 "%GIT%" push origin main --force
