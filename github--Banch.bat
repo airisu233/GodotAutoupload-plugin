@@ -1,6 +1,7 @@
 @echo off
 chcp 65001 >nul
 cd /d "C:\Users\Administrator\Documents\kenneyDungeon"
+
 :: 自动检测 git 路径
 if exist "C:\Program Files\Git\bin\git.exe" (
     set "GIT=C:\Program Files\Git\bin\git.exe"
@@ -36,10 +37,10 @@ for /f "usebackq delims=" %%a in (`powershell -NoProfile -Command "Get-Date -For
 "%GIT%" push origin %BRANCH%
 
 echo Push main failed, saved to branch: %BRANCH%
-:: 用 PowerShell 清理旧分支，只保留最近3个
+
+:: 清理旧分支：远程+本地，各保留最近3个
 echo Cleaning old branches...
-powershell -NoProfile -Command "$branches=git branch -r --sort=-committerdate | Select-String 'origin/main-' | ForEach-Object { $_.Line.Trim().Replace('origin/','') }; $skip=3; foreach ($b in $branches) { if ($skip -gt 0) { $skip-- } else { git push origin --delete $b } }"
+powershell -NoProfile -Command "$remote=git branch -r --list 'origin/main-*' | ForEach-Object { $_.Trim().Replace('origin/','') }; $remoteDelete=$remote | Select-Object -Skip 3; foreach ($b in $remoteDelete) { git push origin --delete $b }; git checkout main 2>$null; $local=git branch --list 'main-*' | ForEach-Object { $_.Trim().Replace('* ','').Replace(' ','') }; $localDelete=$local | Select-Object -Skip 3; foreach ($b in $localDelete) { git branch -D $b 2>$null }"
 
 "%GIT%" fetch --prune 2>nul
 echo Done
-)
