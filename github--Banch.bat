@@ -36,3 +36,10 @@ for /f "usebackq delims=" %%a in (`powershell -NoProfile -Command "Get-Date -For
 "%GIT%" push origin %BRANCH%
 
 echo Push main failed, saved to branch: %BRANCH%
+:: 用 PowerShell 清理旧分支，只保留最近3个
+echo Cleaning old branches...
+powershell -NoProfile -Command "$branches=git branch -r --sort=-committerdate | Select-String 'origin/main-' | ForEach-Object { $_.Line.Trim().Replace('origin/','') }; $skip=3; foreach ($b in $branches) { if ($skip -gt 0) { $skip-- } else { git push origin --delete $b } }"
+
+"%GIT%" fetch --prune 2>nul
+echo Done
+)
